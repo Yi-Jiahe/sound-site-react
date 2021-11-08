@@ -9,6 +9,8 @@ import { Sidebar } from './Sidebar';
 
 import './AudioGraph.css';
 
+const style = { width: "100%", height: "100vh" };
+
 const nodeTypes = {
     sourceNodeComponent: SourceNodeComponent,
     destinationNodeComponent: DestinationNodeComponent,
@@ -110,6 +112,9 @@ function AudioGraph() {
         switch(type) {
             case 'sourceNodeComponent':
                 audioNode = await getMediaStreamSource();
+                if (!audioNode) {
+                    return;
+                }
                 nodes.set(id, audioNode);
                 break;
             case 'analyserNodeComponent':
@@ -153,10 +158,13 @@ function AudioGraph() {
         }
 
         id = getId();
-        nodes.set(id, await getMediaStreamSource());
-        initialElements.push({
-            id: id, type: 'sourceNodeComponent', position: { x: 50, y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
-        });
+        let audioNode = await getMediaStreamSource();
+        if (audioNode) {
+            nodes.set(id, audioNode);
+            initialElements.push({
+                id: id, type: 'sourceNodeComponent', position: { x: 50, y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
+            });
+        }
 
         id = getId();
         nodes.set(id, audioContext.destination);
@@ -180,7 +188,7 @@ function AudioGraph() {
             });
             return audioContext.createMediaStreamSource(stream);
         } catch(err) {
-            console.log(err);
+            window.alert(err);
             return null;
         }
     }
@@ -192,6 +200,7 @@ function AudioGraph() {
                     <ReactFlow
                         elements={elements}
                         nodeTypes={nodeTypes}
+                        style={style}
                         onLoad={onLoad}
                         // onEdgeUpdateStart={onEdgeUpdateStart}
                         // onEdgeUpdateEnd={onEdgeUpdateEnd}
