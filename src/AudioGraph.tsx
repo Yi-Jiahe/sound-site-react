@@ -71,7 +71,7 @@ function AudioGraph() {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     };
-    const onDrop = (event: DragEvent) => {
+    const onDrop = async (event: DragEvent) => {
         event.preventDefault();
 
         if (!reactFlowWrapper.current || !reactFlowInstance) {
@@ -91,6 +91,9 @@ function AudioGraph() {
 
         const id = getId();
         switch(type) {
+            case 'sourceNodeElement':
+                nodes.set(id, await getMediaStreamSource());
+                break;
             case 'analyserNodeElement':
                 const audioNode = new AnalyserNode(audioContext);
                 nodes.set(id, audioNode);
