@@ -203,7 +203,7 @@ const GainNodeComponent:FC<NodeProps> = ({ data }) => {
             <div className="node-component">
                 <span className="drag-handle">Biquad Filter</span>
                 <div className="control">
-                    <span ref={gainSpan}>Gain: 0dB</span>
+                    <span ref={gainSpan}>Gain: 1dB</span>
                     <input ref={gainInput} type="range" min="0" max="100" onChange={onGainChange}></input>
                 </div>
             </div>
