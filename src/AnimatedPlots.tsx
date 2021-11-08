@@ -9,7 +9,7 @@ function useTick(delay:number) {
         }
       }, delay);
       return () => clearInterval(interval);
-    }, []);
+    }, [delay]);
     return tick;
 }
 
@@ -33,7 +33,7 @@ function drawFFT(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, clearCan
         const x = Math.trunc(i);
         const y = Math.trunc((fft[i]/-255+1)*canvas.height);
         // console.log(x, y);
-        if (i == 0) {
+        if (i === 0) {
             ctx.moveTo(0, y);
         } else {
             ctx.lineTo(x, y);
@@ -62,7 +62,7 @@ function drawWaveform(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, cle
         const x = Math.trunc(i);
         const y = Math.trunc((waveform[i]/255)*canvas.height);
         // console.log(x, y);
-        if (i==0) {
+        if (i===0) {
             ctx.moveTo(0, y);
         } else {
             ctx.lineTo(x, y);
@@ -74,9 +74,7 @@ function drawWaveform(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, cle
 const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
     const plotCanvas = useRef<HTMLCanvasElement | null>(null);
 
-    let tick = useTick(1000/30);
-
-    console.log(analyserNode);
+    useTick(1000/30);
 
     if (plotCanvas.current) {
         if (analyserNode) {
@@ -93,9 +91,7 @@ const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
 function WaveformPlot({ analyserNode }: {analyserNode: AnalyserNode}) {
     const plotCanvas = useRef<HTMLCanvasElement | null>(null);
 
-    let tick = useTick(1000/30);
-
-    console.log(analyserNode);
+    useTick(1000/30);
 
     if (plotCanvas.current) {
         if (analyserNode) {

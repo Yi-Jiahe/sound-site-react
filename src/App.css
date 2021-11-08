@@ -19,10 +19,8 @@
     color: white;
 }
 
-.audio-source-node {
-
-}
-
-.audio.destination-node {
-    
+.audio-analyser-node {
+    display:flex;
+    flex-direction: column;
+    /* align-item: center; */
 }

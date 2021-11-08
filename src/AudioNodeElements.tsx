@@ -35,7 +35,8 @@ const DestinationNodeElement: FC<NodeProps> = ({ data }) => {
 const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
     console.log(data.audioNode);
 
-    return (<div>
+    return (
+    <div className="audio-analyser-node">
         <Handle
             id="input"
             type="target"
