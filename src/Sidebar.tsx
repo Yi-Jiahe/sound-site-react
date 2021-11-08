@@ -10,10 +10,13 @@ function Sidebar() {
         <aside>
           <div className="description">You can drag these nodes to the pane on the right.</div>
             <div className="component-selector">
-              <div className="node-component" onDragStart={(event) => onDragStart(event, 'sourceNodeElement')} draggable>
+              <div className="node-component" onDragStart={(event) => onDragStart(event, 'sourceNodeComponent')} draggable>
                 Source Node
               </div>
-              <div className="node-component" onDragStart={(event) => onDragStart(event, 'analyserNodeElement')} draggable>
+              <div className="node-component" onDragStart={(event) => onDragStart(event, 'oscillatorSourceNodeComponent')} draggable>
+                Oscillator Node
+              </div>
+              <div className="node-component" onDragStart={(event) => onDragStart(event, 'analyserNodeComponent')} draggable>
                 Analyser Node
               </div>
           </div>

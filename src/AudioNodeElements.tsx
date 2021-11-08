@@ -3,7 +3,7 @@ import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
 import { FFTPlot, WaveformPlot } from './AnimatedPlots';
 
-const SourceNodeElement: FC<NodeProps> = ({ data }) => {
+const SourceNodeComponent: FC<NodeProps> = ({ data }) => {
     return (
         <>
             <div className="node-component">
@@ -17,7 +17,21 @@ const SourceNodeElement: FC<NodeProps> = ({ data }) => {
     );
 }
 
-const DestinationNodeElement: FC<NodeProps> = ({ data }) => {
+const OscillatorSourceNodeComponent: FC<NodeProps> = ({ data }) => {
+    return (
+        <>
+            <div className="node-component">
+                Oscillator Source
+            </div>
+            <Handle
+                id="output"
+                type="source"
+                position={"right" as Position} />
+        </>
+    );
+}
+
+const DestinationNodeComponent: FC<NodeProps> = ({ data }) => {
     return (
         <>
             <Handle
@@ -31,7 +45,7 @@ const DestinationNodeElement: FC<NodeProps> = ({ data }) => {
     );
 }
 
-const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
+const AnalyserNodeComponent:FC<NodeProps> = ({ data }) => {
     return (
     <>
         <Handle
@@ -50,4 +64,4 @@ const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
     </>);
 }
 
-export { SourceNodeElement, DestinationNodeElement, AnalyserNodeElement };
+export { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent };

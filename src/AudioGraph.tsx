@@ -2,15 +2,16 @@ import React, { useRef, useState, DragEvent } from 'react';
 import ReactFlow, { Background, MiniMap, Controls, 
     Connection, Edge, Elements,  ReactFlowProvider, 
     updateEdge, addEdge,
-    OnLoadParams, OnConnectStartParams } from 'react-flow-renderer';
+    OnLoadParams } from 'react-flow-renderer';
 
-import { SourceNodeElement, DestinationNodeElement, AnalyserNodeElement } from './AudioNodeElements';
+import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent } from './AudioNodeElements';
 import { Sidebar } from './Sidebar';
 
 const nodeTypes = {
-    sourceNodeElement: SourceNodeElement,
-    destinationNodeElement: DestinationNodeElement,
-    analyserNodeElement: AnalyserNodeElement
+    sourceNodeComponent: SourceNodeComponent,
+    destinationNodeComponent: DestinationNodeComponent,
+    analyserNodeComponent: AnalyserNodeComponent,
+    oscillatorSourceNodeComponent: OscillatorSourceNodeComponent
 };
 
 const graphStyles = { width: "100%", height: "500px" };
@@ -22,11 +23,11 @@ const getId = () => `${id++}`;
 
 const nodes: Map<String, AudioNode | null> = new Map();
 
-const onConnectStart = (event: React.MouseEvent, { nodeId, handleType }: OnConnectStartParams) => console.log('onConnectStart', { event, nodeId, handleType });
-const onConnectEnd = (event: MouseEvent) => console.log('onConnectEnd', event);
-const onConnectStop = (event: MouseEvent) => console.log('onConnectStop', event);
-const onEdgeUpdateStart = (_: React.MouseEvent, edge: Edge) => console.log('start update', edge);
-const onEdgeUpdateEnd = (_: MouseEvent, edge: Edge<any>) => console.log('end update', edge);
+// const onConnectStart = (event: React.MouseEvent, { nodeId, handleType }: OnConnectStartParams) => console.log('onConnectStart', { event, nodeId, handleType });
+// const onConnectEnd = (event: MouseEvent) => console.log('onConnectEnd', event);
+// const onConnectStop = (event: MouseEvent) => console.log('onConnectStop', event);
+// const onEdgeUpdateStart = (_: React.MouseEvent, edge: Edge) => console.log('start update', edge);
+// const onEdgeUpdateEnd = (_: MouseEvent, edge: Edge<any>) => console.log('end update', edge);
 
 function AudioGraph() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -44,8 +45,6 @@ function AudioGraph() {
 
     const onLoad = (_reactFlowInstance: OnLoadParams) => setReactFlowInstance(_reactFlowInstance);
     const onEdgeUpdate = (oldEdge: Edge, newConnection: Connection) => {
-        console.log("onEdgeUpdate:" + JSON.stringify(oldEdge) + JSON.stringify(newConnection));
-
         if (!newConnection.source || !newConnection.target) {
             return;
         }
@@ -59,14 +58,15 @@ function AudioGraph() {
             return;
         }
 
+        console.log("Disconnecting " + oldTargetNode + " from " + oldSourceNode);
         oldSourceNode.disconnect(oldTargetNode);
+
+        console.log("Connecting " + newTargetNode + " to " + newSourceNode);
         newSourceNode.connect(newTargetNode);
 
         setElements((els: Elements<any>) => updateEdge(oldEdge, newConnection, els));
     };
     const onConnect = (params: Edge<any> | Connection) => {
-        console.log("onConnect:" + JSON.stringify(params));
-
         if (!params.source || !params.target) {
             return;
         }
@@ -78,7 +78,7 @@ function AudioGraph() {
             return;
         }
 
-        console.log(sourceNode, targetNode);
+        console.log("Connecting " + targetNode + " to " + sourceNode);
         sourceNode.connect(targetNode);
 
         setElements((els: Elements<any>) => addEdge(params, els));
@@ -106,17 +106,28 @@ function AudioGraph() {
         }
 
         const id = getId();
+        let audioNode;
         switch(type) {
-            case 'sourceNodeElement':
-                nodes.set(id, await getMediaStreamSource());
+            case 'sourceNodeComponent':
+                audioNode = await getMediaStreamSource();
+                nodes.set(id, audioNode);
                 break;
-            case 'analyserNodeElement':
-                const audioNode = new AnalyserNode(audioContext, {
+            case 'analyserNodeComponent':
+                audioNode = new AnalyserNode(audioContext, {
                     fftSize: 2048
                 });
                 nodes.set(id, audioNode);
                 break;
+            case 'oscillatorSourceNodeComponent':
+                audioNode = new OscillatorNode(audioContext);
+                audioNode.type = 'sine';
+                audioNode.frequency.setValueAtTime(440, audioContext.currentTime);
+                audioNode.start();
+                nodes.set(id, audioNode);
+                break;
         }
+        console.log(id, audioNode);
+
         const newNode = {
             id: id,
             type,
@@ -144,13 +155,13 @@ function AudioGraph() {
         id = getId();
         nodes.set(id, await getMediaStreamSource());
         initialElements.push({
-            id: id, type: 'sourceNodeElement', position: { x: 50, y: 250 }, data: { audioNode: nodes.get(id) }
+            id: id, type: 'sourceNodeComponent', position: { x: 50, y: 250 }, data: { audioNode: nodes.get(id) }
         });
 
         id = getId();
         nodes.set(id, audioContext.destination);
         initialElements.push({
-            id: id, type: 'destinationNodeElement', position: { x: 700, y: 250 }, data: { audioNode: nodes.get(id) }
+            id: id, type: 'destinationNodeComponent', position: { x: 700, y: 250 }, data: { audioNode: nodes.get(id) }
         })
 
         setElements(initialElements);
@@ -183,12 +194,12 @@ function AudioGraph() {
                         style={graphStyles}
                         nodeTypes={nodeTypes}
                         onLoad={onLoad}
-                        onEdgeUpdateStart={onEdgeUpdateStart}
-                        onEdgeUpdateEnd={onEdgeUpdateEnd}
+                        // onEdgeUpdateStart={onEdgeUpdateStart}
+                        // onEdgeUpdateEnd={onEdgeUpdateEnd}
                         onEdgeUpdate={onEdgeUpdate}
-                        onConnectStart={onConnectStart}
-                        onConnectEnd={onConnectEnd}
-                        onConnectStop={onConnectStop}
+                        // onConnectStart={onConnectStart}
+                        // onConnectEnd={onConnectEnd}
+                        // onConnectStop={onConnectStop}
                         onConnect={onConnect}
                         onDragOver={onDragOver}
                         onDrop={onDrop}>
