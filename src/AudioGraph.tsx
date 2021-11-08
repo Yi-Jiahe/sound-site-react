@@ -44,8 +44,24 @@ function AudioGraph() {
 
     const onLoad = (_reactFlowInstance: OnLoadParams) => setReactFlowInstance(_reactFlowInstance);
     const onEdgeUpdate = (oldEdge: Edge, newConnection: Connection) => {
-        // TODO: Update audio node connections
         console.log("onEdgeUpdate:" + JSON.stringify(oldEdge) + JSON.stringify(newConnection));
+
+        if (!newConnection.source || !newConnection.target) {
+            return;
+        }
+
+        const oldSourceNode = nodes.get(oldEdge.source);
+        const oldTargetNode = nodes.get(oldEdge.target);
+        const newSourceNode = nodes.get(newConnection.source);
+        const newTargetNode = nodes.get(newConnection.target);
+
+        if (!oldSourceNode || !oldTargetNode || !newSourceNode || !newTargetNode) {
+            return;
+        }
+
+        oldSourceNode.disconnect(oldTargetNode);
+        newSourceNode.connect(newTargetNode);
+
         setElements((els: Elements<any>) => updateEdge(oldEdge, newConnection, els));
     };
     const onConnect = (params: Edge<any> | Connection) => {
