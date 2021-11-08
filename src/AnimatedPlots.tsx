@@ -78,7 +78,6 @@ const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
 
     if (plotCanvas.current) {
         if (analyserNode) {
-            console.log(analyserNode);
             drawFFT(analyserNode, plotCanvas.current, true)
         }
     }
@@ -95,7 +94,6 @@ function WaveformPlot({ analyserNode }: {analyserNode: AnalyserNode}) {
 
     if (plotCanvas.current) {
         if (analyserNode) {
-            console.log(analyserNode);
             drawWaveform(analyserNode, plotCanvas.current, true)
         }
     }

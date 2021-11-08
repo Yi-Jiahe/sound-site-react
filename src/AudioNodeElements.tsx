@@ -5,43 +5,40 @@ import { FFTPlot, WaveformPlot } from './AnimatedPlots';
 
 const SourceNodeElement: FC<NodeProps> = ({ data }) => {
     return (
-        <div className="audio-source-node">
-            <div>
+        <>
+            <div className="node-component">
                 Audio Source
             </div>
             <Handle
                 id="output"
                 type="source"
                 position={"right" as Position} />
-        </div>
+        </>
     );
 }
 
 const DestinationNodeElement: FC<NodeProps> = ({ data }) => {
     return (
-        <div className="audio-destination-node">
+        <>
             <Handle
                 id="input"
                 type="target"
                 position={"left" as Position} />
-            <div>
+            <div className="node-component">
                 Audio Destination
             </div>
-
-        </div>
+        </>
     );
 }
 
 const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
-    console.log(data.audioNode);
-
     return (
-    <div className="audio-analyser-node">
+    <>
         <Handle
             id="input"
             type="target"
             position={"left" as Position} />
-        <div>
+        <div className="node-component audio-analyser-node">
             Audio Analyser
             <WaveformPlot analyserNode={data.audioNode} />
             <FFTPlot analyserNode={data.audioNode} />
@@ -50,7 +47,7 @@ const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
             id="output"
             type="source"
             position={"right" as Position} />
-    </div>);
+    </>);
 }
 
 export { SourceNodeElement, DestinationNodeElement, AnalyserNodeElement };
