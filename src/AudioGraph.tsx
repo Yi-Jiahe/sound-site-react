@@ -2,7 +2,7 @@ import React, { useRef, useState, DragEvent } from 'react';
 import ReactFlow, { Background, MiniMap, Controls, 
     Connection, Edge, Elements,  ReactFlowProvider, 
     updateEdge, addEdge,
-    OnLoadParams, OnConnectStartParams, Rect } from 'react-flow-renderer';
+    OnLoadParams, OnConnectStartParams } from 'react-flow-renderer';
 
 import { SourceNodeElement, DestinationNodeElement, AnalyserNodeElement } from './AudioNodeElements';
 import { Sidebar } from './Sidebar';

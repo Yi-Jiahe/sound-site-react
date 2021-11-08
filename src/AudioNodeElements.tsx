@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 
 function SourceNodeElement() {
