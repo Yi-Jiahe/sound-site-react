@@ -7,14 +7,14 @@ import ReactFlow, { Background, MiniMap, Controls,
 import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent } from './AudioNodeElements';
 import { Sidebar } from './Sidebar';
 
+import './AudioGraph.css';
+
 const nodeTypes = {
     sourceNodeComponent: SourceNodeComponent,
     destinationNodeComponent: DestinationNodeComponent,
     analyserNodeComponent: AnalyserNodeComponent,
     oscillatorSourceNodeComponent: OscillatorSourceNodeComponent
 };
-
-const graphStyles = { width: "100%", height: "500px" };
 
 let audioContext: AudioContext;
 
@@ -155,13 +155,13 @@ function AudioGraph() {
         id = getId();
         nodes.set(id, await getMediaStreamSource());
         initialElements.push({
-            id: id, type: 'sourceNodeComponent', position: { x: 50, y: 250 }, data: { audioNode: nodes.get(id) }
+            id: id, type: 'sourceNodeComponent', position: { x: 50, y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
         });
 
         id = getId();
         nodes.set(id, audioContext.destination);
         initialElements.push({
-            id: id, type: 'destinationNodeComponent', position: { x: 700, y: 250 }, data: { audioNode: nodes.get(id) }
+            id: id, type: 'destinationNodeComponent', position: { x: window.innerWidth-200 , y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
         })
 
         setElements(initialElements);
@@ -191,7 +191,6 @@ function AudioGraph() {
                 <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                     <ReactFlow
                         elements={elements}
-                        style={graphStyles}
                         nodeTypes={nodeTypes}
                         onLoad={onLoad}
                         // onEdgeUpdateStart={onEdgeUpdateStart}
