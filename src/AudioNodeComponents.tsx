@@ -28,7 +28,8 @@ const OscillatorSourceNodeComponent: FC<NodeProps> = ({ data }) => {
             return;
         }
 
-        const frequency = Math.floor(Math.pow(Math.E, parseFloat(frequencyInput.current.value)/10));
+        const x = frequencyInput.current.valueAsNumber/10;
+        const frequency = Math.floor(240*x + 0.75*Math.pow(x, 5));
 
         frequencySpan.current.innerText = `Frequency: ${frequency}Hz`;
 
@@ -44,7 +45,7 @@ const OscillatorSourceNodeComponent: FC<NodeProps> = ({ data }) => {
                 <span className="drag-handle">Oscillator Source</span>
                 <div className="control">
                     <span ref={frequencySpan}>Frequency: 440Hz</span>
-                    <input ref={frequencyInput} type="range" min="30" max="100" onChange={onFrequencyChange}></input>
+                    <input ref={frequencyInput} type="range" min="1" defaultValue="20" max="75" onChange={onFrequencyChange}></input>
                 </div>
             </div>
             <Handle
