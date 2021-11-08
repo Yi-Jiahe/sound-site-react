@@ -101,8 +101,8 @@ const AnalyserNodeComponent:FC<NodeProps> = ({ data }) => {
                 <span ref={fftSizeSpan}>FFT Size: 2048</span>
                 <input ref={fftSizeInput} type="range" min="5" defaultValue="11" max="15" onChange={onFrequencyChange}></input>
             </div> */}
-            <WaveformPlot analyserNode={data.audioNode} />
-            <FFTPlot analyserNode={data.audioNode} />
+            <WaveformPlot id={data.id} getWaveform={data.functions.get("getWaveform")} />
+            <FFTPlot id={data.id} getFFT={data.functions.get("getFFT")} />
         </div>
         <Handle
             id="output"

@@ -127,6 +127,18 @@ function AudioGraph() {
                 functions.set("setFFTSize", (id:string, fftSize:number) => {
                     nodes.get(id).fftSize = fftSize
                 });
+                functions.set("getFFT", (id:string) => {
+                    const analyserNode = nodes.get(id);
+                    const fft = new Uint8Array(analyserNode.frequencyBinCount);
+                    analyserNode.getByteFrequencyData(fft);
+                    return fft;
+                })
+                functions.set("getWaveform", (id:string) => {
+                    const analyserNode = nodes.get(id);
+                    const waveform = new Uint8Array(analyserNode.fftSize)
+                    analyserNode.getByteTimeDomainData(waveform);
+                    return waveform;
+                })
                 break;
             case 'oscillatorSourceNodeComponent':
                 audioNode = new OscillatorNode(audioContext);
@@ -167,8 +179,6 @@ function AudioGraph() {
             position,
             data: { 
                 id: `${id}`,
-                audioContext: audioContext,
-                audioNode: nodes.get(`${id}`), 
                 functions: functions
             },
         };
@@ -200,8 +210,6 @@ function AudioGraph() {
                 position: { x: 50, y: window.innerHeight/2 }, 
                 data: { 
                     id: `${id}`,
-                    audioContext: audioContext,
-                    audioNode: nodes.get(`${id}`),
                     functions: new Map()
                 }
             });
@@ -215,8 +223,6 @@ function AudioGraph() {
             position: { x: window.innerWidth-200 , y: window.innerHeight/2 },
             data: {
                 id: `${id+initialElements.length}`,
-                audioContext: audioContext,
-                audioNode: nodes.get(`${id+initialElements.length}`),
                 functions: new Map()
             }
         })

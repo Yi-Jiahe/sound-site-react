@@ -15,10 +15,7 @@ function useTick(delay:number) {
     return tick;
 }
 
-function drawFFT(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, clearCanvas: boolean , options={strokeStyle: 'rgb(0, 0, 0)'}) {
-    const fft = new Uint8Array(analyserNode.frequencyBinCount);
-    analyserNode.getByteFrequencyData(fft);
-
+function drawFFT(fft: Uint8Array, canvas: HTMLCanvasElement, clearCanvas: boolean , options={strokeStyle: 'rgb(0, 0, 0)'}) {
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
@@ -44,10 +41,7 @@ function drawFFT(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, clearCan
     ctx.stroke();
 }
 
-function drawWaveform(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, clearCanvas: boolean , options={strokeStyle: 'rgb(0, 0, 0)'}){
-    const waveform = new Uint8Array(analyserNode.fftSize)
-    analyserNode.getByteTimeDomainData(waveform);
-
+function drawWaveform(waveform: Uint8Array, canvas: HTMLCanvasElement, clearCanvas: boolean , options={strokeStyle: 'rgb(0, 0, 0)'}){
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
@@ -73,15 +67,15 @@ function drawWaveform(analyserNode: AnalyserNode, canvas: HTMLCanvasElement, cle
     ctx.stroke();
 }
 
-const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
+const FFTPlot = ({ id, getFFT }: { id: string, getFFT: (id:string) => Uint8Array }) => {
     const plotCanvas = useRef<HTMLCanvasElement | null>(null);
 
     useTick(1000/30);
 
     if (plotCanvas.current) {
-        if (analyserNode) {
-            drawFFT(analyserNode, plotCanvas.current, true)
-        }
+        const fft = getFFT(id);
+        drawFFT(fft, plotCanvas.current, true);
+        
     }
 
 
@@ -89,15 +83,14 @@ const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
     </canvas>);
 }
 
-function WaveformPlot({ analyserNode }: {analyserNode: AnalyserNode}) {
+function WaveformPlot({ id, getWaveform }: { id: string, getWaveform: (id:string) => Uint8Array }) {
     const plotCanvas = useRef<HTMLCanvasElement | null>(null);
 
     useTick(1000/30);
 
     if (plotCanvas.current) {
-        if (analyserNode) {
-            drawWaveform(analyserNode, plotCanvas.current, true)
-        }
+        const waveform = getWaveform(id);
+        drawWaveform(waveform, plotCanvas.current, true);
     }
 
 
