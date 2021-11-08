@@ -4,7 +4,7 @@ import ReactFlow, { Background, MiniMap, Controls,
     updateEdge, addEdge,
     OnLoadParams } from 'react-flow-renderer';
 
-import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent } from './AudioNodeComponents';
+import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent, BiquadFilterNodeComponent, GainNodeComponent } from './AudioNodeComponents';
 import { Sidebar } from './Sidebar';
 
 import './AudioGraph.css';
@@ -15,7 +15,9 @@ const nodeTypes = {
     sourceNodeComponent: SourceNodeComponent,
     destinationNodeComponent: DestinationNodeComponent,
     analyserNodeComponent: AnalyserNodeComponent,
-    oscillatorSourceNodeComponent: OscillatorSourceNodeComponent
+    oscillatorSourceNodeComponent: OscillatorSourceNodeComponent,
+    biquadFilterNodeComponent: BiquadFilterNodeComponent,
+    gainNodeComponent: GainNodeComponent
 };
 
 let audioContext: AudioContext;
@@ -136,6 +138,25 @@ function AudioGraph() {
                     nodes.get(id).frequency.setValueAtTime(frequency, audioContext.currentTime);
                 });
                 break;
+            case 'biquadFilterNodeComponent':
+                audioNode = new BiquadFilterNode(audioContext);
+                audioNode.type = "lowpass";
+                nodes.set(`${id}`, audioNode);
+                functions.set("changeType", (id: string, type: string) => {
+                    nodes.get(id).type = type;
+                });
+                functions.set("updateFrequency", (id: string, frequency: number) => {
+                    nodes.get(id).frequency.value = frequency;
+                });
+                break;
+                case 'gainNodeComponent':
+                    audioNode = new GainNode(audioContext);
+                    audioNode.gain.value = 0;
+                    nodes.set(`${id}`, audioNode);
+                    functions.set("updateGain", (id: string, gain: number) => {
+                        nodes.get(id).gain.value = gain;
+                    });
+                    break;
         }
         console.log(id, audioNode);
 
