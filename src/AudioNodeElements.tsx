@@ -8,6 +8,7 @@ function SourceNodeElement() {
                 Audio Source
             </div>
             <Handle
+                id="output"
                 type="source"
                 position={"right" as Position} />
         </div>
@@ -18,6 +19,7 @@ function DestinationNodeElement() {
     return (
         <div className="audio-destination-node">
             <Handle
+                id="input"
                 type="target"
                 position={"left" as Position} />
             <div>
@@ -31,12 +33,14 @@ function DestinationNodeElement() {
 function AnalyserNodeElement() {
     return (<div>
         <Handle
+            id="input"
             type="target"
             position={"left" as Position} />
         <div>
             Audio Analyser
         </div>
         <Handle
+            id="output"
             type="source"
             position={"right" as Position} />
     </div>);

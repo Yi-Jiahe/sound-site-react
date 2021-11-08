@@ -1,5 +1,8 @@
 import React, { useRef, useState, DragEvent } from 'react';
-import ReactFlow, { Background, MiniMap, Controls, updateEdge, Connection, Edge, Elements, addEdge, ReactFlowProvider, OnLoadParams } from 'react-flow-renderer';
+import ReactFlow, { Background, MiniMap, Controls, 
+    Connection, Edge, Elements,  ReactFlowProvider, 
+    updateEdge, addEdge,
+    OnLoadParams, OnConnectStartParams, Rect } from 'react-flow-renderer';
 
 import { SourceNodeElement, DestinationNodeElement, AnalyserNodeElement } from './AudioNodeElements';
 import { Sidebar } from './Sidebar';
@@ -12,15 +15,23 @@ const nodeTypes = {
 
 const graphStyles = { width: "100%", height: "500px" };
 
+let audioContext: AudioContext;
+
 let id: number = 0;
 const getId = () => `${id++}`;
+
+const nodes: Map<String, AudioNode | null> = new Map();
+
+const onConnectStart = (event: React.MouseEvent, { nodeId, handleType }: OnConnectStartParams) => console.log('onConnectStart', { event, nodeId, handleType });
+const onConnectEnd = (event: MouseEvent) => console.log('onConnectEnd', event);
+const onConnectStop = (event: MouseEvent) => console.log('onConnectStop', event);
+const onEdgeUpdateStart = (_: React.MouseEvent, edge: Edge) => console.log('start update', edge);
+const onEdgeUpdateEnd = (_: MouseEvent, edge: Edge<any>) => console.log('end update', edge);
 
 function AudioGraph() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams | null>(null);
     const [elements, setElements] = useState<Elements<any>>([]);
-    const [audioContext, setAudioContext] = useState<AudioContext>();
-    const [nodes, setNodes] = useState<Map<string, any>>(new Map());
 
     const createAudioContext = () => {
         if (audioContext) {
@@ -28,17 +39,32 @@ function AudioGraph() {
         }
         // for legacy browsers
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        setAudioContext(new AudioContext());
+        audioContext = new AudioContext();
     }
-
 
     const onLoad = (_reactFlowInstance: OnLoadParams) => setReactFlowInstance(_reactFlowInstance);
     const onEdgeUpdate = (oldEdge: Edge, newConnection: Connection) => {
+        // TODO: Update audio node connections
         console.log("onEdgeUpdate:" + JSON.stringify(oldEdge) + JSON.stringify(newConnection));
         setElements((els: Elements<any>) => updateEdge(oldEdge, newConnection, els));
     };
     const onConnect = (params: Edge<any> | Connection) => {
-        console.log("onConnect:" + JSON.stringify(params.source));
+        console.log("onConnect:" + JSON.stringify(params));
+
+        if (!params.source || !params.target) {
+            return;
+        }
+
+        const sourceNode = nodes.get(params.source);
+        const targetNode = nodes.get(params.target);
+
+        if (!sourceNode || !targetNode) {
+            return;
+        }
+
+        console.log(sourceNode, targetNode);
+        sourceNode.connect(targetNode);
+
         setElements((els: Elements<any>) => addEdge(params, els));
     };
     const onDragOver = (event: DragEvent) => {
@@ -79,7 +105,7 @@ function AudioGraph() {
 
         setElements((es) => es.concat(newNode));
     };
-    const onOverlayClick = () => {
+    const onOverlayClick = async () => {
         createAudioContext();
         if (!audioContext) {
             return;
@@ -95,7 +121,7 @@ function AudioGraph() {
         }
 
         id = getId();
-        nodes.set(id, getMediaStreamSource());
+        nodes.set(id, await getMediaStreamSource());
         initialElements.push({
             id: id, type: 'sourceNodeElement', position: { x: 50, y: 250 }, data: { audioNode: nodes.get(id) }
         });
@@ -106,24 +132,25 @@ function AudioGraph() {
             id: id, type: 'destinationNodeElement', position: { x: 700, y: 250 }, data: { audioNode: nodes.get(id) }
         })
 
-        setNodes(nodes);
         setElements(initialElements);
     };
 
-    const getMediaStreamSource = () => {
+    const getMediaStreamSource = async () => {
         if (!audioContext) {
-            return;
+            return null;
         }
 
         // Get the microphone
-        navigator.mediaDevices.getUserMedia({
-            video: false,
-            audio: true
-        }).then(stream => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: true
+            });
             return audioContext.createMediaStreamSource(stream);
-        }).catch(err => {
-            console.log("You got an error:" + err);
-        });
+        } catch(err) {
+            console.log(err);
+            return null;
+        }
     }
 
     return (
@@ -135,7 +162,12 @@ function AudioGraph() {
                         style={graphStyles}
                         nodeTypes={nodeTypes}
                         onLoad={onLoad}
+                        onEdgeUpdateStart={onEdgeUpdateStart}
+                        onEdgeUpdateEnd={onEdgeUpdateEnd}
                         onEdgeUpdate={onEdgeUpdate}
+                        onConnectStart={onConnectStart}
+                        onConnectEnd={onConnectEnd}
+                        onConnectStop={onConnectStop}
                         onConnect={onConnect}
                         onDragOver={onDragOver}
                         onDrop={onDrop}>
