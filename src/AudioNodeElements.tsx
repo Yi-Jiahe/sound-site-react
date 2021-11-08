@@ -1,6 +1,9 @@
-import { Handle, Position } from 'react-flow-renderer';
+import { FC } from 'react';
+import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
-function SourceNodeElement() {
+import { FFTPlot, WaveformPlot } from './AnimatedPlots';
+
+const SourceNodeElement: FC<NodeProps> = ({ data }) => {
     return (
         <div className="audio-source-node">
             <div>
@@ -14,7 +17,7 @@ function SourceNodeElement() {
     );
 }
 
-function DestinationNodeElement() {
+const DestinationNodeElement: FC<NodeProps> = ({ data }) => {
     return (
         <div className="audio-destination-node">
             <Handle
@@ -29,7 +32,9 @@ function DestinationNodeElement() {
     );
 }
 
-function AnalyserNodeElement() {
+const AnalyserNodeElement:FC<NodeProps> = ({ data }) => {
+    console.log(data.audioNode);
+
     return (<div>
         <Handle
             id="input"
@@ -37,6 +42,8 @@ function AnalyserNodeElement() {
             position={"left" as Position} />
         <div>
             Audio Analyser
+            <WaveformPlot analyserNode={data.audioNode} />
+            <FFTPlot analyserNode={data.audioNode} />
         </div>
         <Handle
             id="output"

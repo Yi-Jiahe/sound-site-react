@@ -111,7 +111,9 @@ function AudioGraph() {
                 nodes.set(id, await getMediaStreamSource());
                 break;
             case 'analyserNodeElement':
-                const audioNode = new AnalyserNode(audioContext);
+                const audioNode = new AnalyserNode(audioContext, {
+                    fftSize: 2048
+                });
                 nodes.set(id, audioNode);
                 break;
         }
