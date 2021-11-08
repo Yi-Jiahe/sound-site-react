@@ -32,6 +32,7 @@ function AudioGraph() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams | null>(null);
     const [id, setId] = useState(0);
+    const [nodes, setNodes] = useState(new Map());
     const [elements, setElements] = useState<Elements<any>>([]);
 
     const createAudioContext = () => {
@@ -60,10 +61,13 @@ function AudioGraph() {
 
         console.log("Disconnecting " + oldTargetNode + " from " + oldSourceNode);
         oldSourceNode.disconnect(oldTargetNode);
+        nodes.set(oldEdge.source, oldSourceNode);
 
         console.log("Connecting " + newTargetNode + " to " + newSourceNode);
         newSourceNode.connect(newTargetNode);
-
+        nodes.set(newConnection.source, newSourceNode);
+        
+        setNodes(nodes);
         setElements((els: Elements<any>) => updateEdge(oldEdge, newConnection, els));
     };
     const onConnect = (params: Edge<any> | Connection) => {
@@ -80,7 +84,9 @@ function AudioGraph() {
 
         console.log("Connecting " + targetNode + " to " + sourceNode);
         sourceNode.connect(targetNode);
+        nodes.set(params.source, sourceNode);
 
+        setNodes(nodes);
         setElements((els: Elements<any>) => addEdge(params, els));
     };
     const onDragOver = (event: DragEvent) => {
@@ -106,6 +112,7 @@ function AudioGraph() {
         }
 
         let audioNode;
+        const functions = new Map();
         switch(type) {
             case 'sourceNodeComponent':
                 audioNode = await getMediaStreamSource();
@@ -126,6 +133,9 @@ function AudioGraph() {
                 audioNode.frequency.setValueAtTime(440, audioContext.currentTime);
                 audioNode.start();
                 nodes.set(`${id}`, audioNode);
+                functions.set("updateFrequency", (id: string, frequency: number) => {
+                    nodes.get(id).frequency.setValueAtTime(frequency, audioContext.currentTime);
+                });
                 break;
         }
         console.log(id, audioNode);
@@ -136,11 +146,15 @@ function AudioGraph() {
             dragHandle: '.drag-handle',
             position,
             data: { 
+                id: `${id}`,
                 audioContext: audioContext,
-                audioNode: nodes.get(`${id}`) 
+                audioNode: nodes.get(`${id}`), 
+                functions: functions
             },
         };
+
         setId(id+1);
+        setNodes(nodes);
         setElements((es) => es.concat(newNode));
     };
     const onOverlayClick = async () => {
@@ -165,8 +179,10 @@ function AudioGraph() {
                 dragHandle: '.drag-handle',
                 position: { x: 50, y: window.innerHeight/2 }, 
                 data: { 
+                    id: `${id}`,
                     audioContext: audioContext,
-                    audioNode: nodes.get(`${id}`) 
+                    audioNode: nodes.get(`${id}`),
+                    functions: new Map()
                 }
             });
         }
@@ -178,12 +194,15 @@ function AudioGraph() {
             dragHandle: '.drag-handle',
             position: { x: window.innerWidth-200 , y: window.innerHeight/2 },
             data: {
+                id: `${id+initialElements.length}`,
                 audioContext: audioContext,
-                audioNode: nodes.get(`${id+initialElements.length}`) 
+                audioNode: nodes.get(`${id+initialElements.length}`),
+                functions: new Map()
             }
         })
 
         setId(id+initialElements.length);
+        setNodes(nodes);
         setElements(initialElements);
     };
 

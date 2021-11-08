@@ -32,10 +32,10 @@ const OscillatorSourceNodeComponent: FC<NodeProps> = ({ data }) => {
 
         frequencySpan.current.innerText = `Frequency: ${frequency}Hz`;
 
-        if (!data.audioNode || !data.audioContext) {
+        if (!data.functions) {
             return;
         }
-        data.audioNode.frequency.setValueAtTime(440, data.audioContext.currentTime);
+        data.functions.get("updateFrequency")(data.id, frequency);
     }
 
     return (
