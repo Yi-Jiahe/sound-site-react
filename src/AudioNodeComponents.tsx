@@ -71,6 +71,24 @@ const DestinationNodeComponent: FC<NodeProps> = ({ data }) => {
 }
 
 const AnalyserNodeComponent:FC<NodeProps> = ({ data }) => {
+    // const fftSizeSpan = useRef<HTMLSpanElement>(null);
+    // const fftSizeInput = useRef<HTMLInputElement>(null);
+
+    // const onFrequencyChange = () => {
+    //     if (!fftSizeSpan.current || !fftSizeInput.current) {
+    //         return;
+    //     }
+
+    //     const fftSize = Math.pow(2, fftSizeInput.current.valueAsNumber);
+
+    //     fftSizeSpan.current.innerText = `FFT Size: ${fftSize}`;
+
+    //     if (!data.functions) {
+    //         return;
+    //     }
+    //     data.functions.get("setFFTSize")(data.id, fftSize);
+    // }
+
     return (
     <>
         <Handle
@@ -79,6 +97,10 @@ const AnalyserNodeComponent:FC<NodeProps> = ({ data }) => {
             position={"left" as Position} />
         <div className="node-component">
             <span className="drag-handle">Audio Analyser</span>
+            {/* <div className="control">
+                <span ref={fftSizeSpan}>FFT Size: 2048</span>
+                <input ref={fftSizeInput} type="range" min="5" defaultValue="11" max="15" onChange={onFrequencyChange}></input>
+            </div> */}
             <WaveformPlot analyserNode={data.audioNode} />
             <FFTPlot analyserNode={data.audioNode} />
         </div>

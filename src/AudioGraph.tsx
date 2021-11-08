@@ -20,8 +20,6 @@ const nodeTypes = {
 
 let audioContext: AudioContext;
 
-const nodes: Map<String, AudioNode | null> = new Map();
-
 // const onConnectStart = (event: React.MouseEvent, { nodeId, handleType }: OnConnectStartParams) => console.log('onConnectStart', { event, nodeId, handleType });
 // const onConnectEnd = (event: MouseEvent) => console.log('onConnectEnd', event);
 // const onConnectStop = (event: MouseEvent) => console.log('onConnectStop', event);
@@ -122,10 +120,11 @@ function AudioGraph() {
                 nodes.set(`${id}`, audioNode);
                 break;
             case 'analyserNodeComponent':
-                audioNode = new AnalyserNode(audioContext, {
-                    fftSize: 2048
-                });
+                audioNode = new AnalyserNode(audioContext);
                 nodes.set(`${id}`, audioNode);
+                functions.set("setFFTSize", (id:string, fftSize:number) => {
+                    nodes.get(id).fftSize = fftSize
+                });
                 break;
             case 'oscillatorSourceNodeComponent':
                 audioNode = new OscillatorNode(audioContext);
