@@ -1,13 +1,15 @@
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
 import { FFTPlot, WaveformPlot } from './AnimatedPlots';
 
+const style = { cursor: "pointer" };
+
 const SourceNodeComponent: FC<NodeProps> = ({ data }) => {
     return (
         <>
-            <div className="node-component">
-                Audio Source
+            <div className="node-component" style={style}>
+                <span className="drag-handle">Audio Source</span>
             </div>
             <Handle
                 id="output"
@@ -18,10 +20,32 @@ const SourceNodeComponent: FC<NodeProps> = ({ data }) => {
 }
 
 const OscillatorSourceNodeComponent: FC<NodeProps> = ({ data }) => {
+    const frequencySpan = useRef<HTMLSpanElement>(null);
+    const frequencyInput = useRef<HTMLInputElement>(null);
+
+    const onFrequencyChange = () => {
+        if (!frequencyInput.current || !frequencySpan.current) {
+            return;
+        }
+
+        const frequency = Math.floor(Math.pow(Math.E, parseFloat(frequencyInput.current.value)/10));
+
+        frequencySpan.current.innerText = `Frequency: ${frequency}Hz`;
+
+        if (!data.audioNode || !data.audioContext) {
+            return;
+        }
+        data.audioNode.frequency.setValueAtTime(440, data.audioContext.currentTime);
+    }
+
     return (
         <>
-            <div className="node-component">
-                Oscillator Source
+            <div className="node-component" style={style}>
+                <span className="drag-handle">Oscillator Source</span>
+                <div className="control">
+                    <span ref={frequencySpan}>Frequency: 440Hz</span>
+                    <input ref={frequencyInput} type="range" min="30" max="100" onChange={onFrequencyChange}></input>
+                </div>
             </div>
             <Handle
                 id="output"
@@ -38,8 +62,8 @@ const DestinationNodeComponent: FC<NodeProps> = ({ data }) => {
                 id="input"
                 type="target"
                 position={"left" as Position} />
-            <div className="node-component">
-                Audio Destination
+            <div className="node-component" style={style}>
+                <span className="drag-handle">Audio Destination</span>
             </div>
         </>
     );
@@ -52,8 +76,8 @@ const AnalyserNodeComponent:FC<NodeProps> = ({ data }) => {
             id="input"
             type="target"
             position={"left" as Position} />
-        <div className="node-component audio-analyser-node">
-            Audio Analyser
+        <div className="node-component">
+            <span className="drag-handle">Audio Analyser</span>
             <WaveformPlot analyserNode={data.audioNode} />
             <FFTPlot analyserNode={data.audioNode} />
         </div>

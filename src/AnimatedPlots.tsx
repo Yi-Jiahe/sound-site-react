@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const style = { cursor: "crosshair", background: "white" };
+
 function useTick(delay:number) {
     const [tick, setTick] = useState(0);
     useEffect(() => {
@@ -83,7 +85,7 @@ const FFTPlot = ({ analyserNode }: {analyserNode: AnalyserNode}) => {
     }
 
 
-    return (<canvas ref={plotCanvas}>
+    return (<canvas ref={plotCanvas} style={style}>
     </canvas>);
 }
 
@@ -99,7 +101,7 @@ function WaveformPlot({ analyserNode }: {analyserNode: AnalyserNode}) {
     }
 
 
-    return (<canvas ref={plotCanvas}>
+    return (<canvas ref={plotCanvas} style={style}>
     </canvas>);
 }
 

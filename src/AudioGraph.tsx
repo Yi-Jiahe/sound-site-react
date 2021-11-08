@@ -4,7 +4,7 @@ import ReactFlow, { Background, MiniMap, Controls,
     updateEdge, addEdge,
     OnLoadParams } from 'react-flow-renderer';
 
-import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent } from './AudioNodeElements';
+import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent } from './AudioNodeComponents';
 import { Sidebar } from './Sidebar';
 
 import './AudioGraph.css';
@@ -20,9 +20,6 @@ const nodeTypes = {
 
 let audioContext: AudioContext;
 
-let id: number = 0;
-const getId = () => `${id++}`;
-
 const nodes: Map<String, AudioNode | null> = new Map();
 
 // const onConnectStart = (event: React.MouseEvent, { nodeId, handleType }: OnConnectStartParams) => console.log('onConnectStart', { event, nodeId, handleType });
@@ -34,6 +31,7 @@ const nodes: Map<String, AudioNode | null> = new Map();
 function AudioGraph() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams | null>(null);
+    const [id, setId] = useState(0);
     const [elements, setElements] = useState<Elements<any>>([]);
 
     const createAudioContext = () => {
@@ -107,7 +105,6 @@ function AudioGraph() {
             return;
         }
 
-        const id = getId();
         let audioNode;
         switch(type) {
             case 'sourceNodeComponent':
@@ -115,31 +112,35 @@ function AudioGraph() {
                 if (!audioNode) {
                     return;
                 }
-                nodes.set(id, audioNode);
+                nodes.set(`${id}`, audioNode);
                 break;
             case 'analyserNodeComponent':
                 audioNode = new AnalyserNode(audioContext, {
                     fftSize: 2048
                 });
-                nodes.set(id, audioNode);
+                nodes.set(`${id}`, audioNode);
                 break;
             case 'oscillatorSourceNodeComponent':
                 audioNode = new OscillatorNode(audioContext);
                 audioNode.type = 'sine';
                 audioNode.frequency.setValueAtTime(440, audioContext.currentTime);
                 audioNode.start();
-                nodes.set(id, audioNode);
+                nodes.set(`${id}`, audioNode);
                 break;
         }
         console.log(id, audioNode);
 
         const newNode = {
-            id: id,
+            id: `${id}`,
             type,
+            dragHandle: '.drag-handle',
             position,
-            data: { audioNode: nodes.get(id) },
+            data: { 
+                audioContext: audioContext,
+                audioNode: nodes.get(`${id}`) 
+            },
         };
-
+        setId(id+1);
         setElements((es) => es.concat(newNode));
     };
     const onOverlayClick = async () => {
@@ -150,28 +151,39 @@ function AudioGraph() {
         document.getElementById("overlay")?.remove();
 
         const initialElements = [];
-
-        let id;
         
         if (!nodes) {
             return;
         }
 
-        id = getId();
         let audioNode = await getMediaStreamSource();
         if (audioNode) {
-            nodes.set(id, audioNode);
+            nodes.set(`${id}`, audioNode);
             initialElements.push({
-                id: id, type: 'sourceNodeComponent', position: { x: 50, y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
+                id: `${id}`, 
+                type: 'sourceNodeComponent', 
+                dragHandle: '.drag-handle',
+                position: { x: 50, y: window.innerHeight/2 }, 
+                data: { 
+                    audioContext: audioContext,
+                    audioNode: nodes.get(`${id}`) 
+                }
             });
         }
 
-        id = getId();
-        nodes.set(id, audioContext.destination);
+        nodes.set(`${id+initialElements.length}`, audioContext.destination);
         initialElements.push({
-            id: id, type: 'destinationNodeComponent', position: { x: window.innerWidth-200 , y: window.innerHeight/2 }, data: { audioNode: nodes.get(id) }
+            id: `${id+initialElements.length}`, 
+            type: 'destinationNodeComponent', 
+            dragHandle: '.drag-handle',
+            position: { x: window.innerWidth-200 , y: window.innerHeight/2 },
+            data: {
+                audioContext: audioContext,
+                audioNode: nodes.get(`${id+initialElements.length}`) 
+            }
         })
 
+        setId(id+initialElements.length);
         setElements(initialElements);
     };
 
