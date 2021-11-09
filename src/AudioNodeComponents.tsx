@@ -183,10 +183,10 @@ const GainNodeComponent:FC<NodeProps> = ({ data }) => {
             return;
         }
 
-        const x = gainInput.current.valueAsNumber;
-        const gain = 0.015*x+0.00000009*Math.pow(x,4);
+        const gainDB = gainInput.current.valueAsNumber - 20;
+        const gain = Math.pow(1.122, gainDB);
 
-        gainSpan.current.innerText = `Gain: ${gain.toFixed(2)}dB`;
+        gainSpan.current.innerText = `Gain: ${gainDB}dB`;
 
         if (!data.functions) {
             return;
@@ -204,7 +204,7 @@ const GainNodeComponent:FC<NodeProps> = ({ data }) => {
                 <span className="drag-handle">Gain Node</span>
                 <div className="control">
                     <span ref={gainSpan}>Gain: 1dB</span>
-                    <input ref={gainInput} type="range" min="0" max="100" onChange={onGainChange}></input>
+                    <input ref={gainInput} type="range" min="0" defaultValue="10" max="40" onChange={onGainChange}></input>
                 </div>
             </div>
             <Handle

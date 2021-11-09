@@ -163,7 +163,7 @@ function AudioGraph() {
                 break;
                 case 'gainNodeComponent':
                     audioNode = new GainNode(audioContext);
-                    audioNode.gain.value = 0;
+                    audioNode.gain.value = 0.5;
                     nodes.set(`${id}`, audioNode);
                     functions.set("updateGain", (id: string, gain: number) => {
                         nodes.get(id).gain.value = gain;
