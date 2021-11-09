@@ -173,7 +173,7 @@ function AudioGraph() {
                 break;
             case 'delayNodeComponent':
                 audioNode = new DelayNode(audioContext, {
-                    maxDelayTime: 5
+                    maxDelayTime: 2
                 });
                 audioNode.delayTime.value = 1;
                 nodes.set(`${id}`, audioNode);
