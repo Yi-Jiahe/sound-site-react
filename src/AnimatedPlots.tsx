@@ -87,10 +87,8 @@ function WaveformPlot({ id, getWaveform }: { id: string, getWaveform: (id:string
     const plotCanvas = useRef<HTMLCanvasElement | null>(null);
 
     useTick(1000/30);
-    console.log("ticking");
 
     if (plotCanvas.current) {
-        console.log("drawing");
         const waveform = getWaveform(id);
         drawWaveform(waveform, plotCanvas.current, true);
     }
