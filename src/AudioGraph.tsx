@@ -88,8 +88,13 @@ function AudioGraph() {
         sourceNode.connect(targetNode);
         nodes.set(params.source, sourceNode);
 
+        console.log(params);
+
+        const newEdge = params as Edge;
+        newEdge.animated = true;
+
         setNodes(nodes);
-        setElements((els: Elements<any>) => addEdge(params, els));
+        setElements((els: Elements<any>) => addEdge(newEdge, els));
     };
     const onDragOver = (event: DragEvent) => {
         event.preventDefault();
