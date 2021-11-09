@@ -25,6 +25,9 @@ function Sidebar() {
               <div className="node-component" onDragStart={(event) => onDragStart(event, 'gainNodeComponent')} draggable>
                 <span className="drag-handle">Gain Node</span>
               </div>
+              <div className="node-component" onDragStart={(event) => onDragStart(event, 'delayNodeComponent')} draggable>
+                <span className="drag-handle">Delay Node</span>
+              </div>
           </div>
         </aside>
       );

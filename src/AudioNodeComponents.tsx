@@ -203,7 +203,7 @@ const GainNodeComponent:FC<NodeProps> = ({ data }) => {
             <div className="node-component">
                 <span className="drag-handle">Gain Node</span>
                 <div className="control">
-                    <span ref={gainSpan}>Gain: 1dB</span>
+                    <span ref={gainSpan}>Gain: -6dB</span>
                     <input ref={gainInput} type="range" min="0" defaultValue="10" max="40" onChange={onGainChange}></input>
                 </div>
             </div>
@@ -214,4 +214,43 @@ const GainNodeComponent:FC<NodeProps> = ({ data }) => {
         </>);
 }
 
-export { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent, BiquadFilterNodeComponent, GainNodeComponent };
+const DelayNodeComponent:FC<NodeProps> = ({ data }) => {
+    const delaySpan = useRef<HTMLSpanElement>(null);
+    const delayInput = useRef<HTMLInputElement>(null);
+    
+    const onDelayChange = () => {
+        if (!delaySpan.current || !delayInput.current) {
+            return;
+        }
+
+        const delay = delayInput.current.valueAsNumber/10;
+
+        delaySpan.current.innerText = `Delay: ${delay}s`;
+
+        if (!data.functions) {
+            return;
+        }
+        data.functions.get("updateDelay")(data.id, delay);
+    }
+
+    return (
+        <>
+            <Handle
+                id="input"
+                type="target"
+                position={"left" as Position} />
+            <div className="node-component">
+                <span className="drag-handle">Delay Node</span>
+                <div className="control">
+                    <span ref={delaySpan}>Delay: 1s</span>
+                    <input ref={delayInput} type="range" min="0" defaultValue="10" max="20" onChange={onDelayChange}></input>
+                </div>
+            </div>
+            <Handle
+                id="output"
+                type="source"
+                position={"right" as Position} />
+        </>);
+}
+
+export { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent, BiquadFilterNodeComponent, GainNodeComponent, DelayNodeComponent };

@@ -4,12 +4,13 @@ import ReactFlow, { Background, MiniMap, Controls,
     updateEdge, addEdge,
     OnLoadParams } from 'react-flow-renderer';
 
-import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent, BiquadFilterNodeComponent, GainNodeComponent } from './AudioNodeComponents';
+import { SourceNodeComponent, DestinationNodeComponent, AnalyserNodeComponent, OscillatorSourceNodeComponent, BiquadFilterNodeComponent, GainNodeComponent, DelayNodeComponent } from './AudioNodeComponents';
 import { Sidebar } from './Sidebar';
 
 import './AudioGraph.css';
 
 const style = { width: "100%", height: "100vh" };
+const miniMapStyle = { top:"10px", bottom: "unset" }
 
 const nodeTypes = {
     sourceNodeComponent: SourceNodeComponent,
@@ -17,7 +18,8 @@ const nodeTypes = {
     analyserNodeComponent: AnalyserNodeComponent,
     oscillatorSourceNodeComponent: OscillatorSourceNodeComponent,
     biquadFilterNodeComponent: BiquadFilterNodeComponent,
-    gainNodeComponent: GainNodeComponent
+    gainNodeComponent: GainNodeComponent,
+    delayNodeComponent: DelayNodeComponent
 };
 
 let audioContext: AudioContext;
@@ -161,14 +163,24 @@ function AudioGraph() {
                     nodes.get(id).frequency.value = frequency;
                 });
                 break;
-                case 'gainNodeComponent':
-                    audioNode = new GainNode(audioContext);
-                    audioNode.gain.value = 0.5;
-                    nodes.set(`${id}`, audioNode);
-                    functions.set("updateGain", (id: string, gain: number) => {
-                        nodes.get(id).gain.value = gain;
-                    });
-                    break;
+            case 'gainNodeComponent':
+                audioNode = new GainNode(audioContext);
+                audioNode.gain.value = 0.5;
+                nodes.set(`${id}`, audioNode);
+                functions.set("updateGain", (id: string, gain: number) => {
+                    nodes.get(id).gain.value = gain;
+                });
+                break;
+            case 'delayNodeComponent':
+                audioNode = new DelayNode(audioContext, {
+                    maxDelayTime: 5
+                });
+                audioNode.delayTime.value = 1;
+                nodes.set(`${id}`, audioNode);
+                functions.set("updateDelay", (id: string, delay: number) => {
+                    nodes.get(id).delayTime.value = delay;
+                });
+                break;
         }
         console.log(id, audioNode);
 
@@ -268,7 +280,7 @@ function AudioGraph() {
                         onConnect={onConnect}
                         onDragOver={onDragOver}
                         onDrop={onDrop}>
-                        <MiniMap />
+                        <MiniMap style={miniMapStyle} />
                         <Controls />
                         <Background color="#aaa" gap={16} />
                     </ReactFlow>
